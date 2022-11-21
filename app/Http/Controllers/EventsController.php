@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Date;
+use App\Models\Workshop;
 
 class EventsController extends BaseController
 {
@@ -179,6 +180,18 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+        $date = date('Y-m-d');
+
+        $futureEvents = Event::Join('workshops','events.id','workshops.event_id')
+        ->whereDate('workshops.start','>',$date)->get(['workshops.*','events.name as event_name', 'events.created_at as event_created_at','events.updated_at as event_updated_at']);
+        $events = [];
+        foreach($futureEvents as $futureEvent){
+            $events['event_id'][] =  [
+                ''
+            ];
+
+        }
+
+        return $futureEvents;
     }
 }
