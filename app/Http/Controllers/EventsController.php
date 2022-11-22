@@ -184,14 +184,41 @@ class EventsController extends BaseController
 
         $futureEvents = Event::Join('workshops','events.id','workshops.event_id')
         ->whereDate('workshops.start','>',$date)->get(['workshops.*','events.name as event_name', 'events.created_at as event_created_at','events.updated_at as event_updated_at']);
+      
         $events = [];
+        $arrayEvent = []; 
         foreach($futureEvents as $futureEvent){
-            $events['event_id'][] =  [
-                ''
+
+
+            $key = array_search($futureEvent['event_id'], array_values($arrayEvent));
+
+            if($key == false){
+
+                $arrayEvent[] =  $futureEvent['event_id'];
+
+                $events[] =  [
+                    'id' => $futureEvent['event_id'],
+                    'name' => $futureEvent['event_name'],
+                    'created_at' => $futureEvent['event_created_at'],
+                    'updated_at' => $futureEvent['event_updated_at']
+                ];
+            }
+           $workShopKey = array_search($futureEvent['event_id'], array_values($arrayEvent));
+
+            $events[$workShopKey]['workshops'][] =  [
+                'id' => $futureEvent['id'],
+                'event_id' => $futureEvent['event_id'],
+                'start' => $futureEvent['start'],
+                'end' => $futureEvent['end'],
+                'name' => $futureEvent['name'],
+                'created_at' => $futureEvent['created_at'],
+                'updated_at' => $futureEvent['updated_at']
             ];
+
+            
 
         }
 
-        return $futureEvents;
+        return $events;
     }
 }
